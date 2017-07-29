@@ -6,7 +6,6 @@ import android.support.v7.widget.CardView;
 import android.support.v7.widget.GridLayoutManager;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
-import android.support.v7.widget.StaggeredGridLayoutManager;
 import android.util.Log;
 
 import com.google.android.gms.ads.AdListener;
@@ -14,14 +13,6 @@ import com.google.android.gms.ads.AdRequest;
 import com.google.android.gms.ads.AdSize;
 import com.google.android.gms.ads.NativeExpressAdView;
 
-import org.json.JSONArray;
-import org.json.JSONException;
-import org.json.JSONObject;
-
-import java.io.BufferedReader;
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.InputStreamReader;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -34,10 +25,10 @@ import java.util.List;
  * are no longer visible to the user. Recycling views improves performance by avoiding
  * the creation of unnecessary views or performing expensive findViewByID() lookups.</p>
  */
-public class MainActivity extends AppCompatActivity {
+public class MainActivityRecycleView extends AppCompatActivity {
 
     // A Native Express ad is placed in every nth position in the RecyclerView.
-    public static final int ITEMS_PER_AD = 7;
+    public static final int ITEMS_PER_AD = 9;
 
     // The Native Express ad height.
     private static final int NATIVE_EXPRESS_AD_HEIGHT = 150;
@@ -73,7 +64,7 @@ public class MainActivity extends AppCompatActivity {
                     case 0:
                         return 1;
                     case 1:
-                        return gridLayoutManager.getSpanCount();
+                        return 2;
                     default:
                         return -1;
                 }
@@ -84,7 +75,7 @@ public class MainActivity extends AppCompatActivity {
         mRecyclerView.setLayoutManager(gridLayoutManager);
 
         // Update the RecyclerView item's list with menu items and Native Express ads.
-        addMenuItemsFromJson();
+        addMenuItems();
         addNativeExpressAds();
         setUpAndLoadNativeExpressAds();
 
@@ -101,7 +92,7 @@ public class MainActivity extends AppCompatActivity {
         // Loop through the items array and place a new Native Express ad in every ith position in
         // the items List.
         for (int i = 0; i <= mRecyclerViewItems.size(); i += ITEMS_PER_AD) {
-            final NativeExpressAdView adView = new NativeExpressAdView(MainActivity.this);
+            final NativeExpressAdView adView = new NativeExpressAdView(MainActivityRecycleView.this);
             mRecyclerViewItems.add(i, adView);
         }
     }
@@ -116,7 +107,7 @@ public class MainActivity extends AppCompatActivity {
         mRecyclerView.post(new Runnable() {
             @Override
             public void run() {
-                final float scale = MainActivity.this.getResources().getDisplayMetrics().density;
+                final float scale = MainActivityRecycleView.this.getResources().getDisplayMetrics().density;
                 // Set the ad size and ad unit ID for each Native Express ad in the items list.
                 for (int i = 0; i <= mRecyclerViewItems.size(); i += ITEMS_PER_AD) {
                     final NativeExpressAdView adView =
@@ -167,7 +158,7 @@ public class MainActivity extends AppCompatActivity {
             public void onAdFailedToLoad(int errorCode) {
                 // The previous Native Express ad failed to load. Call this method again to load
                 // the next ad in the items list.
-                Log.e("MainActivity", "The previous Native Express ad failed to load. Attempting to"
+                Log.e("MainActivityRecycleView", "The previous Native Express ad failed to load. Attempting to"
                         + " load the next Native Express ad in the items list.");
                 loadNativeExpressAd(index + ITEMS_PER_AD);
             }
@@ -180,56 +171,32 @@ public class MainActivity extends AppCompatActivity {
     /**
      * Adds {@link MenuItem}'s from a JSON file.
      */
-    private void addMenuItemsFromJson() {
-        try {
-            String jsonDataString = readJsonDataFromFile();
-            JSONArray menuItemsJsonArray = new JSONArray(jsonDataString);
+    private void addMenuItems() {
 
-            for (int i = 0; i < menuItemsJsonArray.length(); ++i) {
 
-                JSONObject menuItemObject = menuItemsJsonArray.getJSONObject(i);
+                mRecyclerViewItems.add(new MenuItem(R.mipmap.d01));
+                mRecyclerViewItems.add(new MenuItem(R.mipmap.d01));
+        mRecyclerViewItems.add(new MenuItem(R.mipmap.d01));
+        mRecyclerViewItems.add(new MenuItem(R.mipmap.d01));
+        mRecyclerViewItems.add(new MenuItem(R.mipmap.d01));
+        mRecyclerViewItems.add(new MenuItem(R.mipmap.d01));
+        mRecyclerViewItems.add(new MenuItem(R.mipmap.d01));
+        mRecyclerViewItems.add(new MenuItem(R.mipmap.d01));
+        mRecyclerViewItems.add(new MenuItem(R.mipmap.d01));
+        mRecyclerViewItems.add(new MenuItem(R.mipmap.d01));
+        mRecyclerViewItems.add(new MenuItem(R.mipmap.d01));
+        mRecyclerViewItems.add(new MenuItem(R.mipmap.d01));
+        mRecyclerViewItems.add(new MenuItem(R.mipmap.d01));
+        mRecyclerViewItems.add(new MenuItem(R.mipmap.d01));
+        mRecyclerViewItems.add(new MenuItem(R.mipmap.d01));
+        mRecyclerViewItems.add(new MenuItem(R.mipmap.d01));
+        mRecyclerViewItems.add(new MenuItem(R.mipmap.d01));
+        mRecyclerViewItems.add(new MenuItem(R.mipmap.d01));
+        mRecyclerViewItems.add(new MenuItem(R.mipmap.d01));
 
-                String menuItemName = menuItemObject.getString("name");
-                String menuItemDescription = menuItemObject.getString("description");
-                String menuItemPrice = menuItemObject.getString("price");
-                String menuItemCategory = menuItemObject.getString("category");
-                String menuItemImageName = menuItemObject.getString("photo");
 
-                MenuItem menuItem = new MenuItem(menuItemName, menuItemDescription, menuItemPrice,
-                        menuItemCategory, menuItemImageName);
-                mRecyclerViewItems.add(menuItem);
-            }
-        } catch (IOException | JSONException exception) {
-            Log.e(MainActivity.class.getName(), "Unable to parse JSON file.", exception);
-        }
     }
 
-    /**
-     * Reads the JSON file and converts the JSON data to a {@link String}.
-     *
-     * @return A {@link String} representation of the JSON data.
-     * @throws IOException if unable to read the JSON file.
-     */
-    private String readJsonDataFromFile() throws IOException {
 
-        InputStream inputStream = null;
-        StringBuilder builder = new StringBuilder();
-
-        try {
-            String jsonDataString = null;
-            inputStream = getResources().openRawResource(R.raw.menu_items_json);
-            BufferedReader bufferedReader = new BufferedReader(
-                    new InputStreamReader(inputStream, "UTF-8"));
-            while ((jsonDataString = bufferedReader.readLine()) != null) {
-                builder.append(jsonDataString);
-            }
-        } finally {
-            if (inputStream != null) {
-                inputStream.close();
-            }
-        }
-
-        return new String(builder);
-    }
 
 }
